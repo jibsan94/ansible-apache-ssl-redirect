@@ -1,0 +1,12 @@
+---
+
+- name: Copying Certificate to server
+  copy: src=apache.pem dest=/etc/httpd/apache.pem
+
+- name: Copying ports.conf to apache2 folder
+  copy: src=ports.conf dest=/etc/httpd/conf/httpd.conf
+
+- name: Apache2 | Enable default-ssl site
+  action: command a2ensite default-ssl
+  notify:
+    - restart apache2 rh

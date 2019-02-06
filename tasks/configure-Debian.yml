@@ -1,0 +1,28 @@
+---
+
+- name: Copying Certificate to server
+  copy: src=apache.pem dest={{ apache_server_root }}/apache.pem
+
+- name: Enable Apache mods.
+  file:
+    src: "{{ apache_server_root }}/mods-available/{{ item }}"
+    dest: "{{ apache_server_root }}/mods-enabled/{{ item }}"
+    state: link
+  with_items: "{{ apache_mods_enabled }}"
+  notify: apache2 service
+
+- name: Copying ports.conf to apache2 folder
+  copy: src=ports.conf dest={{ apache_server_root }}/ports.conf
+
+- name: Copying default-ssl.conf to sites-enabled
+  copy: src=default-ssl.conf dest={{ apache_server_root }}/sites-available/default-ssl.conf
+
+- name: Apache2 | Habilitar sitio default-ssl
+  action: command a2ensite default-ssl
+  notify:
+    - restart apache2 service
+
+- name: Copying 000-default.conf to sites-available
+  copy: src=000-default.conf dest={{ apache_server_root }}/sites-available/000-default.conf
+  notify:
+    - restart apache2 service
